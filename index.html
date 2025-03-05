@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>all</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <link type="text/css" rel="stylesheet" href="./css/index.css" />
+</head>
+
+<body>
+  <div class="button-container">
+    <button id="btnCameraMain">Caméra principale</button>
+    <button id="btnCameraX">Caméra horizontale</button>
+    <button id="btnCameraY">Caméra Y</button>
+  </div>
+
+  <div class="inventory">
+    <button id="inventoryCubeJaune"></button>
+    <button id="inventoryCubeVert"></button>
+    <button id="inventoryCubeBleu"></button>
+    <button id="inventoryCubeRose"></button>
+    <button id="inventoryCubeGris"></button>
+  </div>
+
+  <audio id="bandeSon" src="./audio/bandeSon.mp3" loop autoplay style="display: none;"></audio>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../build/three.module.js",
+        "three/addons/": "./jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="index.js"></script>
+</body>
+
+
+</html>
