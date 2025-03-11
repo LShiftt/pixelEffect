@@ -2,6 +2,7 @@ import { createPixelEffect } from "./postprocess-pixel.js";
 import * as THREE from "three";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { createRocket, rocket } from "./model/fusee/rocket.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 const inventoryItems = [
   {
@@ -121,6 +122,28 @@ const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 const player = new THREE.Mesh(cubeGeometry, cubeMaterial);
 scene.add(player);
 
+// Astronaute
+const createAstronaut = (scene) => {
+  const loader = new GLTFLoader();
+  loader.load(
+    "./model/astronauta/scene.gltf", // chemin vers votre fichier glTF
+    (gltf) => {
+      const astronaut = gltf.scene;
+
+      astronaut.scale.set(0.01, 0.01, 0.01);
+      // Positionnez-le selon vos besoins (exemple ici à x=5)
+      astronaut.position.set(0.3, 0.3, 0);
+
+      scene.add(astronaut);
+    },
+    undefined,
+    (error) => {
+      console.error("Erreur de chargement du modèle GLTF", error);
+    }
+  );
+};
+createAstronaut(scene);
+// Fusée
 createRocket(scene);
 rocket.position.set(0, 2.28, 0);
 rocket.rotation.set(
@@ -135,7 +158,7 @@ const planetMaterial = new THREE.MeshStandardMaterial({ map: planetTexture });
 const planet = new THREE.Mesh(planetGeometry, planetMaterial);
 scene.add(planet);
 
-player.position.set(0.2, 2.10, 0);
+player.position.set(0.2, 2.1, 0);
 
 // Fonctionnalité de déplacement
 const raycaster = new THREE.Raycaster();
