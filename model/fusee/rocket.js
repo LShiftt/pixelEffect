@@ -3,9 +3,10 @@ import * as THREE from "three";
 
 let rocket, rocket_fire;
 const rocketParts = {};
-let scWing = "red",
-  scBody = "blue",
-  scWindow = "gray";
+
+let scWing = localStorage.getItem("scWing") || "red",
+  scBody = localStorage.getItem("scBody") || "blue",
+  scWindow = localStorage.getItem("scWindow") || "gray";
 
 // /**
 //  * Mettre à jour la couleur du cube.
@@ -15,7 +16,6 @@ let scWing = "red",
 // }
 
 export const createRocket = (scene) => {
-  // Facteur de réduction des dimensions (division par 10)
   const s = 0.01;
 
   // Partie supérieure de la fusée (pointe)
@@ -114,9 +114,9 @@ export const createRocket = (scene) => {
     new THREE.CylinderGeometry(9 * s, 9 * s, 8 * s, 64),
     new THREE.MeshPhysicalMaterial({
       color: scWindow,
-      roughness: 0.1,
+      roughness: 1,
       transmission: 1,
-      thickness: 0.9,
+      thickness: 0.1,
       side: THREE.DoubleSide,
     })
   );
@@ -128,7 +128,7 @@ export const createRocket = (scene) => {
   rocketParts.fina = new THREE.Mesh(
     new THREE.BoxGeometry(40 * s, 8 * s, 18 * s),
     new THREE.MeshStandardMaterial({
-      color: 0xff0000,
+      color: scWing,
     })
   );
   scene.add(rocketParts.fina);
@@ -138,7 +138,7 @@ export const createRocket = (scene) => {
   rocketParts.finb = new THREE.Mesh(
     new THREE.BoxGeometry(40 * s, 8 * s, 18 * s),
     new THREE.MeshStandardMaterial({
-      color: 0xff0000,
+      color: scWing,
     })
   );
   scene.add(rocketParts.finb);
@@ -194,7 +194,7 @@ export const createRocket = (scene) => {
     rocketParts.finb,
     rocket_fire
   );
-  rocket.position.y = 2.30;
+  rocket.position.y = 2.3;
   rocket.position.x = 0;
   rocket.position.z = 0;
 
