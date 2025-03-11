@@ -100,7 +100,7 @@ export const createRocket = (scene) => {
     new THREE.CylinderGeometry(12 * s, 12 * s, 23 * s, 64),
     new THREE.MeshStandardMaterial({
       color: "#ffffff",
-      roughness: 0.5,
+      roughness: 1,
       metalness: 1,
       side: THREE.DoubleSide,
     })
