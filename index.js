@@ -1,6 +1,7 @@
 import { createPixelEffect } from "./postprocess-pixel.js";
 import * as THREE from "three";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
+import { createRocket, rocket } from "./model/fusee/rocket.js";
 
 const inventoryItems = [
   {
@@ -87,7 +88,7 @@ const cameraMain = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-cameraMain.position.set(5, 3, 5);
+cameraMain.position.set(5, 3, 5); //5.3.5
 
 const cameraX = new THREE.PerspectiveCamera(
   75,
@@ -120,13 +121,21 @@ const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 const player = new THREE.Mesh(cubeGeometry, cubeMaterial);
 scene.add(player);
 
+createRocket(scene);
+rocket.position.set(0, 2.28, 0);
+rocket.rotation.set(
+  THREE.MathUtils.degToRad(35),
+  THREE.MathUtils.degToRad(80),
+  THREE.MathUtils.degToRad(-35)
+);
+
 // Création de la planète
 const planetGeometry = new THREE.SphereGeometry(2, 32, 32);
 const planetMaterial = new THREE.MeshStandardMaterial({ map: planetTexture });
 const planet = new THREE.Mesh(planetGeometry, planetMaterial);
 scene.add(planet);
 
-player.position.set(2.15, 0, 0);
+player.position.set(0.2, 2.10, 0);
 
 // Fonctionnalité de déplacement
 const raycaster = new THREE.Raycaster();
@@ -246,14 +255,12 @@ gui
     updateCamera(newCamera);
   });
 
-
 const playerSettings = {
-  speed: 0.01, 
+  speed: 0.01,
   showTrajectory: true,
   showPath: true,
   color: "#ff0000",
 };
-
 
 gui.add(playerSettings, "speed", 0.01, 0.1, 0.01).name("Vitesse Joueur");
 gui
@@ -270,7 +277,6 @@ gui
   .onChange((value) => {
     player.material.color.set(value);
   });
-
 
 // Poser des objets sur le sol
 
