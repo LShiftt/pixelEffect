@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 
 // Initialisation de la scène, caméra et rendu
@@ -20,11 +21,51 @@ document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
-// cube rouge
-const cubeGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-const player = new THREE.Mesh(cubeGeometry, cubeMaterial);
-scene.add(player);
+// Ajout de lumières
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(5, 5, 5);
+scene.add(directionalLight);
+
+// Charger le modèle 3D
+const loader = new GLTFLoader();
+let player, mixer, idleAction, walkAction, runAction;
+loader.load("./model/astronauta/scene.gltf", (gltf) => {
+  player = gltf.scene;
+  player.scale.set(0.2, 0.2, 0.2);
+  player.position.set(2.15, 0, 0);
+  scene.add(player);
+
+  // Initialiser l'AnimationMixer
+  mixer = new THREE.AnimationMixer(player);
+
+  // Chercher les animations disponibles
+  const idleClip = gltf.animations.find((clip) =>
+    clip.name.toLowerCase().includes("idle")
+  );
+  const walkClip = gltf.animations.find((clip) =>
+    clip.name.toLowerCase().includes("walk")
+  );
+  const runClip = gltf.animations.find((clip) =>
+    clip.name.toLowerCase().includes("run")
+  );
+
+  if (idleClip) {
+    idleAction = mixer.clipAction(idleClip);
+    idleAction.loop = THREE.LoopRepeat;
+    idleAction.play(); // Démarrer en idle par défaut
+  }
+  if (walkClip) {
+    walkAction = mixer.clipAction(walkClip);
+    walkAction.loop = THREE.LoopRepeat;
+  }
+  if (runClip) {
+    runAction = mixer.clipAction(runClip);
+    runAction.loop = THREE.LoopRepeat;
+  }
+});
 
 // sphère
 const sphereGeometry = new THREE.SphereGeometry(2, 32, 32);
@@ -35,8 +76,6 @@ const wireframeMaterial = new THREE.MeshBasicMaterial({
 const planet = new THREE.Mesh(sphereGeometry, wireframeMaterial);
 scene.add(planet);
 
-player.position.set(2.15, 0, 0);
-
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -46,14 +85,11 @@ let startQuaternion = new THREE.Quaternion();
 let endQuaternion = new THREE.Quaternion();
 
 let progress = 0;
-let totalAngle = 0;
-let rotationAxis = new THREE.Vector3();
-let pathLine = null;
-let pathHistory = [];
 let moving = false;
+const WALK_THRESHOLD = 1.5; // Distance à partir de laquelle on court
 
 function onMouseClick(event) {
-  if (moving) return;
+  if (moving || !player) return;
 
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -65,47 +101,43 @@ function onMouseClick(event) {
     const newTargetPosition = intersects[0].point
       .normalize()
       .multiplyScalar(2.15);
+    const normal = intersects[0].point.clone().normalize();
 
     startPosition.copy(player.position);
     startQuaternion.copy(player.quaternion);
 
-    rotationAxis = new THREE.Vector3()
-      .crossVectors(startPosition, newTargetPosition)
+    // Calcul de la direction de déplacement projetée sur le plan tangent
+    const direction = newTargetPosition.clone().sub(startPosition).normalize();
+    const tangentDirection = direction
+      .clone()
+      .projectOnPlane(normal)
       .normalize();
-    totalAngle = startPosition.angleTo(newTargetPosition);
 
-    const rotationQuaternion = new THREE.Quaternion().setFromAxisAngle(
-      rotationAxis,
-      totalAngle
-    );
-    endQuaternion.copy(startQuaternion).multiply(rotationQuaternion);
+    // Création d'une base orthonormée locale
+    const up = normal; // Y local
+    const forward = tangentDirection; // Z local
+    const right = new THREE.Vector3().crossVectors(up, forward).normalize(); // X local
+
+    // Création de la matrice de rotation
+    const rotationMatrix = new THREE.Matrix4().makeBasis(right, up, forward);
+
+    // Conversion de la matrice en quaternion
+    endQuaternion.setFromRotationMatrix(rotationMatrix);
 
     targetPosition = newTargetPosition;
     progress = 0;
     moving = true;
 
-    drawPath(startPosition, targetPosition);
-  }
-}
+    // Choisir la bonne animation
+    const distance = startPosition.distanceTo(targetPosition);
+    if (distance < WALK_THRESHOLD && walkAction) {
+      walkAction.reset().play();
+    } else if (distance >= WALK_THRESHOLD && runAction) {
+      runAction.reset().play();
+    }
 
-function drawPath(start, end) {
-  if (pathLine) scene.remove(pathLine);
-
-  const curve = new THREE.CatmullRomCurve3([start, end]);
-  const points = curve.getPoints(50);
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-  const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-
-  pathLine = new THREE.Line(geometry, material);
-  scene.add(pathLine);
-
-  if (settings.showPath) {
-    const pathSegment = new THREE.Line(
-      geometry,
-      new THREE.LineBasicMaterial({ color: 0xff00ff })
-    );
-    scene.add(pathSegment);
-    pathHistory.push(pathSegment);
+    // Arrêter idle
+    if (idleAction) idleAction.stop();
   }
 }
 
@@ -114,19 +146,14 @@ window.addEventListener("click", onMouseClick);
 function animate() {
   requestAnimationFrame(animate);
 
-  if (targetPosition) {
-    progress += settings.speed;
-    if (progress < 1) {
-      const currentAngle = totalAngle * progress;
-      const currentQuaternion = new THREE.Quaternion().setFromAxisAngle(
-        rotationAxis,
-        currentAngle
-      );
-      const newPosition = startPosition
-        .clone()
-        .applyQuaternion(currentQuaternion);
-      player.position.copy(newPosition);
+  if (mixer) {
+    mixer.update(0.016); // Mettre à jour l'animation
+  }
 
+  if (targetPosition && player) {
+    progress += 0.02;
+    if (progress < 1) {
+      player.position.lerpVectors(startPosition, targetPosition, progress);
       player.quaternion.slerpQuaternions(
         startQuaternion,
         endQuaternion,
@@ -137,6 +164,11 @@ function animate() {
       player.quaternion.copy(endQuaternion);
       targetPosition = null;
       moving = false;
+
+      // Arrêter course ou marche, relancer idle
+      if (runAction) runAction.stop();
+      if (walkAction) walkAction.stop();
+      if (idleAction) idleAction.play();
     }
   }
 
@@ -145,31 +177,3 @@ function animate() {
 }
 
 animate();
-
-// Interface GUI
-const gui = new GUI();
-const settings = {
-  speed: 0.02,
-  reset: () => resetPlayer(),
-  showTrajectory: true,
-  showPath: true,
-  color: "#ff0000",
-};
-
-gui.add(settings, "speed", 0.01, 0.1, 0.01).name("Vitesse");
-gui
-  .add(settings, "showTrajectory")
-  .name("Afficher Trajectoire")
-  .onChange(updateTrajectoryVisibility);
-gui
-  .add(settings, "showPath")
-  .name("Afficher Chemin")
-  .onChange(updatePathVisibility);
-
-function updateTrajectoryVisibility() {
-  if (pathLine) pathLine.visible = settings.showTrajectory;
-}
-
-function updatePathVisibility() {
-  pathHistory.forEach((line) => (line.visible = settings.showPath));
-}
