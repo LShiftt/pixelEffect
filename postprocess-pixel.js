@@ -16,7 +16,7 @@ export function createPixelEffect(scene, camera, renderer) {
   // GUI 
   const gui = new GUI();
   const params = {
-    pixelSize: 4,
+    pixelSize: 3,
     normalEdgeStrength: 0.3,
     depthEdgeStrength: 0.4,
     pixelAlignedPanning: true,
