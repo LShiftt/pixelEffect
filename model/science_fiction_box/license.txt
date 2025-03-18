@@ -1,0 +1,11 @@
+Model Information:
+* title:	Science Fiction Box
+* source:	https://sketchfab.com/3d-models/science-fiction-box-3d5e1fd2e764404d931adaee478e1350
+* author:	Max Doroszewski (https://sketchfab.com/MDoroszewski)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Science Fiction Box" (https://sketchfab.com/3d-models/science-fiction-box-3d5e1fd2e764404d931adaee478e1350) by Max Doroszewski (https://sketchfab.com/MDoroszewski) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

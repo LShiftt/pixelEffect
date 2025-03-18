@@ -30,4 +30,5 @@ export function createPixelEffect(scene, camera, renderer) {
   gui.add(params, "pixelAlignedPanning");
 
   return composer;
+  ColetandoChao
 }

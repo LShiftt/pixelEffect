@@ -1,0 +1,11 @@
+Model Information:
+* title:	Final Space - Mooncake
+* source:	https://sketchfab.com/3d-models/final-space-mooncake-57a0b6753f1f4620958bd82f2d8ba734
+* author:	SpinatoSimone (https://sketchfab.com/Spino98)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Final Space - Mooncake" (https://sketchfab.com/3d-models/final-space-mooncake-57a0b6753f1f4620958bd82f2d8ba734) by SpinatoSimone (https://sketchfab.com/Spino98) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

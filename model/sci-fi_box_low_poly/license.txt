@@ -1,0 +1,11 @@
+Model Information:
+* title:	sci-fi box Low Poly
+* source:	https://sketchfab.com/3d-models/sci-fi-box-low-poly-24ef91937b174741bff015e2c5e02365
+* author:	pryoxs (https://sketchfab.com/power142)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "sci-fi box Low Poly" (https://sketchfab.com/3d-models/sci-fi-box-low-poly-24ef91937b174741bff015e2c5e02365) by pryoxs (https://sketchfab.com/power142) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
